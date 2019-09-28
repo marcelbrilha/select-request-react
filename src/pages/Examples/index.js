@@ -38,7 +38,7 @@ const Examples = () => {
       >
         <Grid item xs={12} sm={6}>
           <Typography variant="h5" gutterBottom>
-            Example error and retry
+            Example success
           </Typography>
 
           <SelectRequest
