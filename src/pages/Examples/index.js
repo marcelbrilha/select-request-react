@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, Box } from "@material-ui/core";
+import { Grid, AppBar, Toolbar, Typography } from "@material-ui/core";
 
 import SelectRequest from "../../components/SelectRequest";
 
@@ -19,15 +19,27 @@ const Examples = () => {
   };
 
   return (
-    <Grid
-      container
-      direction="row"
-      justify="flex-start"
-      alignItems="flex-start"
-    >
-      <Grid item xs={12} md={6}>
-        <Box p={1}>
-          <h1>Example Success</h1>
+    <>
+      <AppBar>
+        <Toolbar>
+          <Typography variant="h6" noWrap>
+            Select Request React
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      <Grid
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        spacing={2}
+        style={{ marginTop: "80px" }}
+      >
+        <Grid item xs={12} sm={6}>
+          <Typography variant="h5" gutterBottom>
+            Example error and retry
+          </Typography>
 
           <SelectRequest
             placeholder="Estados"
@@ -37,13 +49,19 @@ const Examples = () => {
             handleError={handleError}
           />
 
-          <p>Selected value: {valueRequest}</p>
-        </Box>
-      </Grid>
+          <Typography
+            variant="body2"
+            gutterBottom
+            style={{ marginTop: "15px" }}
+          >
+            <strong>Selected value:</strong> {valueRequest}
+          </Typography>
+        </Grid>
 
-      <Grid item xs={12} md={6}>
-        <Box p={1}>
-          <h1>Example error and retry</h1>
+        <Grid item xs={12} sm={6}>
+          <Typography variant="h5" gutterBottom>
+            Example error and retry
+          </Typography>
 
           <SelectRequest
             placeholder="Estados"
@@ -52,9 +70,9 @@ const Examples = () => {
             onChange={handleChange}
             handleError={handleError}
           />
-        </Box>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

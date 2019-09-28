@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/styles";
 
-const Style = makeStyles({
+export default makeStyles({
   container: {
     position: "relative"
   },
@@ -21,4 +21,9 @@ const Style = makeStyles({
   }
 });
 
-export default Style;
+export const customStyles = {
+  container: provided => ({
+    ...provided,
+    fontFamily: ["Roboto"].join(",")
+  })
+};

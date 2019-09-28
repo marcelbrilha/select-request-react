@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import Select from "react-select";
 import axios from "axios";
 
-import Style from "./style";
+import Style, { customStyles } from "./style";
 
 const SelectRequest = ({
   url,
@@ -77,6 +77,7 @@ const SelectRequest = ({
         placeholder={placeholder}
         isDisabled={isDisabled}
         isSearchable={isSearchable}
+        styles={customStyles}
       />
 
       {loading && <CircularProgress className={classes.progress} />}
