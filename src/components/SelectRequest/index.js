@@ -1,92 +1,98 @@
-import React, { PureComponent } from "react";
-import { CircularProgress, Icon } from "@material-ui/core";
+import React, { useState, useEffect, memo } from "react";
+import { debounce } from "lodash";
+import { CircularProgress, Icon, Tooltip } from "@material-ui/core";
 import PropTypes from "prop-types";
 import Select from "react-select";
 import axios from "axios";
 
-import "./style.css";
+import Style from "./style";
 
-export default class SelectRequest extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: null,
-      retry: false,
-      loading: false,
-      errorIcon: false,
-      options: []
+const SelectRequest = ({
+  url,
+  configOptions,
+  onChange,
+  handleError,
+  placeholder,
+  isDisabled = false,
+  isSearchable = true
+}) => {
+  const [value, setValue] = useState();
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errorIcon, setErrorIcon] = useState(false);
+  const [retry, setRetry] = useState(false);
+
+  useEffect(() => {
+    const mapOptions = data => {
+      const { label, value } = configOptions;
+
+      return data
+        .sort((a, b) => String(a[label]).localeCompare(String(b[label])))
+        .map(options => {
+          return {
+            label: options[label],
+            value: options[value]
+          };
+        });
     };
-  }
 
-  componentDidMount() {
-    this.request();
-  }
+    const load = async () => {
+      setLoading(true);
 
-  request() {
-    this.setState({ loading: true });
-
-    axios
-      .get(this.props.url)
-      .then(response => {
-        const data = response.data;
-        this.setState({ loading: false });
+      try {
+        const { data } = await axios.get(url);
+        setLoading(false);
 
         if (data && Array.isArray(data)) {
-          this.mapOptions(data);
+          const options = mapOptions(data);
+          setOptions(options);
         } else {
-          this.setState({ errorIcon: true });
-          this.props.handleError(Error("Invalid response data"));
+          setErrorIcon(true);
+          handleError(Error("Invalid response data"));
         }
-      })
-      .catch(error => {
+      } catch (error) {
         console.log(`Error in select request: ${error}`);
-        this.setState({ loading: false, errorIcon: true });
-        this.props.handleError(error);
-      });
-  }
+        setLoading(false);
+        setErrorIcon(true);
+        handleError(error);
+      }
+    };
 
-  mapOptions(data) {
-    const { label, value } = this.props.configOptions;
+    load();
+  }, [configOptions, handleError, url, retry]);
 
-    const options = data
-      .sort((a, b) => String(a[label]).localeCompare(String(b[label])))
-      .map(options => {
-        return {
-          label: options[label],
-          value: options[value]
-        };
-      });
-
-    this.setState({ options });
-  }
-
-  handleChange = option => {
-    this.setState({ value: option });
-    this.props.onChange(option.value);
+  const handleChange = option => {
+    setValue(option);
+    onChange(option.value);
   };
 
-  render() {
-    return (
-      <div className="container">
-        <Select
-          value={this.state.value}
-          onChange={this.handleChange}
-          options={this.state.options}
-          placeholder={this.props.placeholder}
-          isDisabled={this.props.isDisabled}
-          isSearchable={this.props.isSearchable}
-        />
+  const classes = Style();
 
-        {this.state.loading && <CircularProgress className="progress" />}
-        {this.state.errorIcon && (
-          <Icon className="errorIcon" onClick={() => this.request()}>
+  return (
+    <div className={classes.container}>
+      <Select
+        value={value}
+        onChange={handleChange}
+        options={options}
+        placeholder={placeholder}
+        isDisabled={isDisabled}
+        isSearchable={isSearchable}
+      />
+
+      {loading && <CircularProgress className={classes.progress} />}
+      {errorIcon && (
+        <Tooltip title="Retry" placement="bottom">
+          <Icon
+            className={classes.errorIcon}
+            onClick={debounce(() => setRetry(!retry), 1000)}
+          >
             error
           </Icon>
-        )}
-      </div>
-    );
-  }
-}
+        </Tooltip>
+      )}
+    </div>
+  );
+};
 
 SelectRequest.propTypes = {
   url: PropTypes.string.isRequired,
@@ -100,3 +106,14 @@ SelectRequest.propTypes = {
   isDisabled: PropTypes.bool,
   isSearchable: PropTypes.bool
 };
+
+export default memo(SelectRequest, (prevProps, nextProps) => {
+  if (
+    prevProps.configOptions.label !== nextProps.configOptions.label ||
+    prevProps.configOptions.value !== nextProps.configOptions.value
+  ) {
+    return false;
+  }
+
+  return true;
+});
