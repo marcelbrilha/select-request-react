@@ -16,13 +16,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install
-    
+    - name: Scan vulnerabilities with Snyk
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
     - name: Scan vulnerabilities with Horusec
       id: run_horusec
       uses: fike/horusec-action@v0.2.2
