@@ -7,14 +7,14 @@ const Examples = () => {
   const [valueRequest, setValueRequest] = useState("");
   const configOptions = {
     label: "sigla",
-    value: "id"
+    value: "id",
   };
 
-  const handleChange = option => {
+  const handleChange = (option) => {
     setValueRequest(option);
   };
 
-  const handleError = error => {
+  const handleError = (error) => {
     console.log(error);
   };
 
@@ -31,7 +31,7 @@ const Examples = () => {
       <Grid
         container
         direction="row"
-        justify="flex-start"
+        justifyContent="flex-start"
         alignItems="flex-start"
         spacing={2}
         style={{ marginTop: "80px" }}
